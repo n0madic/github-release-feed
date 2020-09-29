@@ -25,11 +25,12 @@ import (
 
 type config struct {
 	GitHubToken string   `env:"GITHUB_TOKEN"`
-	Stars       uint     `env:"GITHUB_STARS" envDefault:"1"`
 	Languages   []string `env:"GITHUB_LANGUAGES" envSeparator:"," envDefault:"go"`
+	Stars       uint     `env:"GITHUB_STARS" envDefault:"1"`
 }
 
 var (
+	cfg    config
 	client *github.Client
 	mutex  sync.Mutex
 
@@ -45,7 +46,6 @@ var (
 )
 
 func main() {
-	cfg := config{}
 	if err := env.Parse(&cfg); err != nil {
 		log.Fatalf("config: %s", err)
 	}
@@ -60,7 +60,7 @@ func main() {
 	client = github.NewClient(tc)
 
 	for _, lang := range cfg.Languages {
-		go checkUpdates(strings.ToLower(lang), cfg.Stars)
+		go checkUpdates(strings.ToLower(lang))
 	}
 
 	r := mux.NewRouter()
@@ -96,7 +96,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func checkUpdates(language string, stars uint) {
+func checkUpdates(language string) {
 	logger := log.WithFields(log.Fields{
 		"language": language,
 	})
@@ -105,7 +105,7 @@ func checkUpdates(language string, stars uint) {
 		Link:  &feeds.Link{Href: "https://github.com"},
 	}
 	for {
-		query := fmt.Sprintf("language:%s stars:>%d", language, stars)
+		query := fmt.Sprintf("language:%s stars:>%d", language, cfg.Stars)
 		items, err := getUpdates(query)
 		if err != nil {
 			logger.Error(err.Error())
