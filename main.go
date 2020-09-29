@@ -27,6 +27,7 @@ type config struct {
 	GitHubToken string   `env:"GITHUB_TOKEN"`
 	Languages   []string `env:"GITHUB_LANGUAGES" envSeparator:"," envDefault:"go"`
 	Stars       uint     `env:"GITHUB_STARS" envDefault:"1"`
+	MaxItems    uint     `env:"FEED_MAX_ITEMS" envDefault:"10"`
 }
 
 var (
@@ -128,8 +129,8 @@ func checkUpdates(language string) {
 				return feed[language].Items[i].Updated.After(feed[language].Items[j].Updated)
 			})
 
-			if len(feed[language].Items) > 10 {
-				feed[language].Items = append([]*feeds.Item{}, feed[language].Items[:10]...)
+			if len(feed[language].Items) > int(cfg.MaxItems) {
+				feed[language].Items = append([]*feeds.Item{}, feed[language].Items[:cfg.MaxItems]...)
 			}
 
 			for i := len(feed[language].Items) - 1; i >= 0; i-- {
