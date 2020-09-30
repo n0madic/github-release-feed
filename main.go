@@ -126,7 +126,7 @@ func checkUpdates(language string) {
 			}
 
 			sort.Slice(feed[language].Items, func(i, j int) bool {
-				return feed[language].Items[i].Updated.After(feed[language].Items[j].Updated)
+				return feed[language].Items[i].Created.After(feed[language].Items[j].Created)
 			})
 
 			if len(feed[language].Items) > int(cfg.MaxItems) {
@@ -134,13 +134,13 @@ func checkUpdates(language string) {
 			}
 
 			for i := len(feed[language].Items) - 1; i >= 0; i-- {
-				if feed[language].Items[i].Updated.After(minimalTimestamp) &&
-					feed[language].Items[i].Updated.After(feed[language].Updated) {
-					logger.Infof("%s at %s", feed[language].Items[i].Title, feed[language].Items[i].Updated)
+				if feed[language].Items[i].Created.After(minimalTimestamp) &&
+					feed[language].Items[i].Created.After(feed[language].Created) {
+					logger.Infof("%s at %s", feed[language].Items[i].Title, feed[language].Items[i].Created)
 				}
 			}
 
-			feed[language].Updated = feed[language].Items[0].Updated
+			feed[language].Created = feed[language].Items[0].Created
 			mutex.Unlock()
 		}
 		time.Sleep(5 * time.Minute)
@@ -193,7 +193,7 @@ func getUpdates(query string) ([]*feeds.Item, error) {
 						Id:          release.GetHTMLURL(),
 						Description: description,
 						Author:      &feeds.Author{Name: release.Author.GetLogin()},
-						Updated:     release.GetPublishedAt().Time,
+						Created:     release.GetPublishedAt().Time,
 					}
 					items = append(items, item)
 				}
