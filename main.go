@@ -65,6 +65,14 @@ func main() {
 	}
 
 	r := mux.NewRouter()
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		html := "<h2>Available GitHub release feeds:</h2>"
+		for _, lang := range cfg.Languages {
+			html += fmt.Sprintf("<h4><a href=\"%s\">%s</a></h4>", lang, strings.Title(lang))
+		}
+		w.Header().Set("Content-Type", "text/html")
+		w.Write([]byte(html))
+	})
 	r.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "https://github.githubassets.com/favicons/favicon.png", http.StatusMovedPermanently)
 	})
