@@ -13,7 +13,7 @@ import (
 
 	"github.com/apex/log"
 	"github.com/caarlos0/env"
-	"github.com/google/go-github/github"
+	"github.com/google/go-github/v41/github"
 	"github.com/google/logger"
 	"github.com/gorilla/feeds"
 	"github.com/gorilla/mux"
